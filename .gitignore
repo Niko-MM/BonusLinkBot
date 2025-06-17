@@ -1,0 +1,30 @@
+# Python
+__pycache__
+*.py[cod]
+*.so
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+ENV/
+.env
+.env.local
+.env.*       
+*.env.*      
+*.sqlite
+*.log        
+logs/
+*.db        
+
+# IDE / редакторы
+.idea/
+.vscode/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# Асинхронные локи pip
+pip-selfcheck.json
