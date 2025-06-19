@@ -25,16 +25,36 @@ def init_db():
     - staff — список кассиров
     - purchase_codes — коды для начисления баллов
     - spend_codes — коды для списания баллов
-    
-    Также создаёт индекс для ускорения поиска по user_id в таблице spend_codes
+
+    Также создаёт индексы для ускорения поиска:
+    - idx_spend_codes_user_id
+    - idx_purchase_codes_user_id
     """
     with connect() as conn:
         cur = conn.cursor()
 
-        # Индексируем user_id в таблице spend_codes
-        cur.execute("CREATE INDEX IF NOT EXISTS idx_spend_codes_user_id ON spend_codes(user_id)")
+        # 1. Таблица клиентов
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS clients(
+                user_id INTEGER PRIMARY KEY,
+                username TEXT,
+                full_name TEXT,
+                points INTEGER DEFAULT 0,
+                total_purchases INTEGER DEFAULT 0
+            )""")
 
-        # Таблица покупок (начисления баллов)
+        # 2. Таблица сотрудников (кассиров)
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS staff(
+                staff_id INTEGER PRIMARY KEY,
+                cafe_id INTEGER NOT NULL,
+                cafe_name TEXT NOT NULL,
+                username TEXT,
+                full_name TEXT,
+                is_active BOOLEAN DEFAULT 0    
+            )""")
+
+        # 3. Таблица кодов начисления
         cur.execute("""
             CREATE TABLE IF NOT EXISTS purchase_codes (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -46,37 +66,21 @@ def init_db():
             )
         """)
 
-        # Таблица клиентов
+        # 4. Таблица кодов списания
         cur.execute("""
-            CREATE TABLE IF NOT EXISTS clients(
-                user_id INTEGER PRIMARY KEY,
-                username TEXT,
-                full_name TEXT,
-                points INTEGER DEFAULT 0,
-                total_purchases INTEGER DEFAULT 0
+            CREATE TABLE IF NOT EXISTS spend_codes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                code TEXT NOT NULL,
+                cost INTEGER NOT NULL,
+                used BOOLEAN DEFAULT 0,
+                FOREIGN KEY(user_id) REFERENCES clients(user_id)
             )""")
 
-        # Таблица сотрудников
-        cur.execute("""
-            CREATE TABLE IF NOT EXISTS staff(
-                staff_id INTEGER PRIMARY KEY,
-                cafe_id INTEGER NOT NULL,
-                cafe_name TEXT NOT NULL,
-                username TEXT,
-                full_name TEXT,
-                is_active BOOLEAN DEFAULT 0    
-            )""")
-        
-        # Таблица списаний баллов
-        cur.execute("""
-        CREATE TABLE IF NOT EXISTS spend_codes (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER NOT NULL,
-        code TEXT NOT NULL,
-        cost INTEGER NOT NULL,
-        used BOOLEAN DEFAULT 0,
-        FOREIGN KEY(user_id) REFERENCES clients(user_id)
-)""")
+        # Теперь можно добавлять индексы
+        cur.execute("CREATE INDEX IF NOT EXISTS idx_spend_codes_user_id ON spend_codes(user_id)")
+        cur.execute("CREATE INDEX IF NOT EXISTS idx_purchase_codes_user_id ON purchase_codes(user_id)")
+
         conn.commit()
 
 
