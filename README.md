@@ -83,7 +83,7 @@ BonusLinkBot/
 
 1. Склонируйте репозиторий:
    ```bash
-   git clone https://github.com/yourname/cafe_loyalty_bot.git 
+   git clone https://github.com/Amphetam1ne/BonusLinkBot.git  
 
 2. Установите зависимости:
     pip install -r requirements.txt
@@ -108,5 +108,6 @@ BonusLinkBot/
 ## 👤 Автор
 
 Разработчик: Илья Николаев
+
 Telegram: [@Nikoniko94]  
 Проект создан как MVP-решение для автоматизации системы лояльности.
